@@ -1,4 +1,3 @@
-versiyon1 > versiyon2 > versiyon3 > versiyon 2 kopyalama
-
-bu ikinci cümle
+Bu satırlar senin yerel değişikliğin.
+Bu satırlar uzak repodan gelen değişiklik.
 
