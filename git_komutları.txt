@@ -1,0 +1,61 @@
+✅ Git Kullanıcı Adı ve Mail Tanımlama
+*Global (Tüm projeler için) tanımlamak istersen:➜
+git config --global user.name "Halil Ibrahim"
+git config --global user.email "halil@example.com"
+
+*Sadece bu proje için tanımlamak istersen (bulunduğun klasör için):➜
+git config user.name "Halil Ibrahim"
+git config user.email "halil@example.com"
+
+🔍 Kontrol etmek için:			➜ git config --global --list
+
+veya sadece bu proje için:	➜ git config --list
+
+git init  			➜ Komutu, bulunduğun klasörü bir Git deposuna (repository) dönüştürür.
+
+git add . 			➜ Bu komut, bulunduğun dizindeki tüm değişiklikleri (yeni dosyalar, silinenler, düzenlenenler) “staging area” (hazırlık alanı) denen Git’in geçici alanına ekler.
+
+git add . 			➜ tüm değişiklikleri staging area'ya koyar
+git commit 			➜ staging area’dakileri kalıcı olarak Git deposuna kaydeder
+git status 			➜ Durumu kontrol eder
+git log    			➜ Bu komut, projende yapılan tüm commit geçmişini listeler.
+git log --oneline		➜ Daha kısa liste:
+git log --oneline --graph --all ➜ Grafik ve özet görünüm
+git log main.py			➜ Belirli dosyadaki commit geçmişi
+git diff			➜ Dosyalarda yapılan ama git add ile eklenmemiş değişiklikleri gösterir.
+git diff --staged		➜ git add yapılmış ama henüz git commit yapılmamış değişiklikleri gösterir.
+git revert <commit-id>		➜ Yapılan bir commit’i iptal etmez, onu tersine çeviren yeni bir commit oluşturur.
+				   Yani geçmişi bozmadan hatayı geri almış olursun. Not: commit-id ilk 7 hanesi bile yeterlidir.
+
+git rm gereksiz.txt		➜ Dosyayı fiziksel olarak siler (çalışma klasöründen silinir)
+				   Git’e “bu dosya bir sonraki commit’te silinmeli” der (staging area’ya silinmiş olarak ekler)
+
+git rm gereksiz.txt
+git commit -m 			➜ Sonuç: gereksiz.txt dosyası hem Git geçmişinden hem fiziksel klasörden silinir.
+
+📁 Dosya ismini değiştirme:
+git mv notlar.txt notlar_eski.txt
+git commit -m "notlar.txt yeniden adlandırıldı" 	➜ 📁 Dosya ismini değiştirme
+
+📂 Klasör içine taşıma:
+git mv main.py src/main.py
+git commit -m "main.py dosyası src klasörüne taşındı"   ➜ 📂 Klasör içine taşıma
+
+git checkout -- dosya.txt     	➜ Bu komut, dosya.txt dosyasını en son commit’teki hâline geri döndürür. Henüz commit edilmemiş değişiklikler silinir. ⚠️
+git checkout -- <file_name>   	➜ <file_name>'in yerine dosya adı yazılır.
+git checkout branch_adi		➜ Branch'e geçer
+git checkout -b yeni_branch	➜ Yeni branch oluşturup geçer
+
+
+
+git reset HEAD dosya.txt	➜ 
+
+
+
+
+***git çalışma dizini: Working Directory: add ➜ Staging Area: commit ➜ Git Repository***
+
+git-bash komutları:
+pwd 				➜ bulunduğu dizini gösterir
+ls 				➜ dosya ve dizinleri listeler
+cd 				➜ dizine gider
