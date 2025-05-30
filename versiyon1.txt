@@ -1,3 +1,0 @@
-Bu satırlar senin yerel değişikliğin.
-Bu satırlar uzak repodan gelen değişiklik.
-
