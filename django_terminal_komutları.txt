@@ -1,0 +1,21 @@
+venv\Scripts\activate 				> sanal ortamı aktif etme (venv) başına gelir
+django-admin startproject blog .		> bu dizinin içine django projesi oluştur
+python manage.py runserver 			> server çalışmak için kullanılır
+python manage.py migrate			> database oluşturur.
+python manage.py createsuperuser		> admin bir kullanıcı oluşturma komutu
+python manage.py startapp post			> post adında uygulama başlat
+
+
+
+
+
+
+MANAGE.py					> komut satırından aldığı parametreleri çalıştırır
+__init__.py					> standart olması gereken dosya
+settings.py					> ayarlar dosyası ayarlar burada yapılacak
+installed_apps					> projedeki hazır apps ler
+TEMPLATES 					> html for ve if döngüsü gibi komutların olduğu katmankomutları katmanı
+DATABASE					> standart SqlLite ile gerlir
+URL						> web sayfamız için url adresi ayarları yapılır.
+migrate						> göç ettirme taşıma anlamı taşır verilerimiz veritabanına taşır.
+app						> django porjesini oluşturan parçalardır. 
