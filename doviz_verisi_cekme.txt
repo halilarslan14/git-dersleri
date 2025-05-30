@@ -1,0 +1,92 @@
+import sys                                                  #........ Uygulamanın çalışmasını başlatmak ve sonlandırmak için kullanılır
+import requests                                               #........ İnternetten veri (API) çekmek için kullanılan modül
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QLabel,
+    QLineEdit, QPushButton, QComboBox
+)                                                          #........ PyQt5'ten temel arayüz bileşenlerini içe aktarıyoruz
+from PyQt5.QtGui import QFont                                  #........ Yazı tipi ayarlamaları için modül
+
+class SimpleCurrencyConverter(QWidget):                     #........ Ana pencere sınıfımızı tanımlıyoruz (QWidget'ten türetiliyor)
+    def __init__(self):
+        super().__init__()                                   #........ Üst sınıfın (QWidget) yapılandırıcısını çağırıyoruz
+
+        self.setWindowTitle("Basit Döviz Çevirici")          #........ Pencere başlığını ayarlıyoruz
+        self.setGeometry(200, 200, 300, 150)                  #........ Pencerenin ekran üzerindeki konumunu ve boyutunu ayarlıyoruz
+
+        self.symbols = {                                      #........ Döviz birimlerinin sembollerini içeren bir sözlük tanımlıyoruz
+            "USD": "$",
+            "EUR": "€",
+            "TRY": "₺",
+            "GBP": "£",
+            "JPY": "¥"
+        }
+
+        self.available_currencies = ["USD", "TRY", "GBP", "JPY"] #........ Kullanıcının seçebileceği hedef para birimleri listesi
+        self.fixed_from_currency = "EUR"                     #........ Sabit kaynak para birimini "EUR" olarak tanımlıyoruz
+        self.api_key = "ff18428f1ef2b05b139d7db20dd9e95f"  #........ Kendi data.fixer.io API anahtarınızı buraya girin
+
+        self.setup_ui()                                      #........ Arayüz elemanlarını oluşturmak ve düzenlemek için metodu çağırıyoruz
+
+    def setup_ui(self):                                      #........ Arayüz elemanlarını oluşturduğumuz metot
+        layout = QVBoxLayout()                               #........ Dikey bir düzenleme (layout) oluşturuyoruz
+
+        self.amount_input = QLineEdit()                      #........ Kullanıcının döviz miktarını gireceği bir metin kutusu oluşturuyoruz
+        self.amount_input.setPlaceholderText(f"{self.fixed_from_currency} Miktarı") #........ Metin kutusuna bir yer tutucu metin ekliyoruz
+        layout.addWidget(self.amount_input)                 #........ Metin kutusunu layout'a ekliyoruz
+
+        self.to_currency_label = QLabel("Hedef Birim:")       #........ "Hedef Birim:" etiketini oluşturuyoruz
+        layout.addWidget(self.to_currency_label)            #........ Etiketi layout'a ekliyoruz
+
+        self.to_currency_combo = QComboBox()                 #........ Hedef para birimi seçimi için bir açılır liste (ComboBox) oluşturuyoruz
+        self.to_currency_combo.addItems(self.available_currencies) #........ Açılır listeye mevcut para birimlerini ekliyoruz
+        layout.addWidget(self.to_currency_combo)             #........ Açılır listeyi layout'a ekliyoruz
+
+        self.convert_button = QPushButton("Çevir")           #........ "Çevir" butonunu oluşturuyoruz
+        self.convert_button.clicked.connect(self.convert_currency) #........ Butona tıklama olayını döviz çevirme fonksiyonuna bağlıyoruz
+        layout.addWidget(self.convert_button)             #........ Butonu layout'a ekliyoruz
+
+        self.result_label = QLabel("Sonuç:")                 #........ Çeviri sonucunu göstereceğimiz bir etiket oluşturuyoruz
+        layout.addWidget(self.result_label)                  #........ Etiketi layout'a ekliyoruz
+
+        self.setLayout(layout)                               #........ Oluşturduğumuz layout'u pencereye uyguluyoruz
+
+    def convert_currency(self):                             #........ Döviz çevirme işlemini gerçekleştiren metot
+        amount_text = self.amount_input.text()              #........ Kullanıcının girdiği döviz miktarını alıyoruz
+        to_currency = self.to_currency_combo.currentText()  #........ Kullanıcının seçtiği hedef para birimini alıyoruz
+        from_currency = self.fixed_from_currency           #........ Sabit kaynak para birimini alıyoruz ("EUR")
+
+        if not amount_text.replace('.', '', 1).isdigit():  #........ Girilen miktarın geçerli bir sayı olup olmadığını kontrol ediyoruz
+            self.result_label.setText("Geçerli bir miktar girin.") #........ Geçersizse hata mesajı gösteriyoruz
+            return                                          #........ Fonksiyondan çıkıyoruz
+
+        amount = float(amount_text)                        #........ Girilen miktarı ondalıklı sayıya (float) çeviriyoruz
+        url = f"http://data.fixer.io/api/latest?access_key={self.api_key}&symbols={to_currency}&base={from_currency}" #........ data.fixer.io API'sine istek URL'sini oluşturuyoruz
+
+        try:
+            response = requests.get(url)                   #........ API'ye GET isteği gönderiyoruz
+            response.raise_for_status()                    #........ Eğer istek başarısızsa (4xx veya 5xx hata kodu) bir HTTPError yükseltiyoruz
+            data = response.json()                          #........ API'den gelen JSON formatındaki veriyi çözüyoruz
+
+            if data and data.get("success"):                #........ API isteğinin başarılı olup olmadığını kontrol ediyoruz
+                if 'rates' in data and to_currency in data['rates']: #........ Yanıtta 'rates' ve hedef para biriminin kuru olup olmadığını kontrol ediyoruz
+                    conversion_rate = data['rates'][to_currency] #........ Hedef para biriminin kurunu alıyoruz
+                    result = amount * conversion_rate      #........ Çevirme işlemini gerçekleştiriyoruz
+                    result_text = f"{amount:.2f} {from_currency} = {result:.2f} {to_currency} {self.symbols.get(to_currency, '')}" #........ Sonuç metnini oluşturuyoruz
+                    self.result_label.setText(f"Sonuç: {result_text}") #........ Sonucu ekranda gösteriyoruz
+                else:
+                    self.result_label.setText("Geçersiz hedef birim veya kur bilgisi alınamadı.") #........ Geçersiz hedef birim veya kur yoksa hata mesajı
+            else:
+                error_info = data.get("error", {})         #........ API'den gelen hata bilgilerini alıyoruz
+                error_message = error_info.get("message", "API Hatası") #........ Hata mesajını alıyoruz veya genel bir mesaj kullanıyoruz
+                self.result_label.setText(f"API Hatası: {error_message}") #........ API hatasını ekranda gösteriyoruz
+
+        except requests.exceptions.RequestException as e:    #........ Bağlantı hatalarını yakalıyoruz
+            self.result_label.setText(f"Bağlantı Hatası: {e}") #........ Bağlantı hatasını ekranda gösteriyoruz
+        except Exception as e:                               #........ Diğer olası hataları yakalıyoruz
+            self.result_label.setText(f"Bir Hata Oluştu: {e}") #........ Genel bir hata mesajı gösteriyoruz
+
+if __name__ == "__main__":                                   #........ Eğer bu dosya doğrudan çalıştırılıyorsa
+    app = QApplication(sys.argv)                           #........ Bir PyQt5 uygulama nesnesi oluşturuyoruz
+    window = SimpleCurrencyConverter()                   #........ Döviz çevirici pencere nesnesini oluşturuyoruz
+    window.show()                                          #........ Pencereyi ekranda gösteriyoruz
+    sys.exit(app.exec_())                                  #........ Uygulama olay döngüsünü başlatıyoruz ve uygulama çıkışını yönetiyoruz
